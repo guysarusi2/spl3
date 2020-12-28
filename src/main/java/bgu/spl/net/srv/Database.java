@@ -12,26 +12,26 @@ package bgu.spl.net.srv;
 public class Database {
 
 
-	//to prevent user from creating new Database
-	private Database() {
-		// TODO: implement
-	}
+    //to prevent user from creating new Database
+    private Database() {
+        // TODO: implement
+    }
 
-	/**
-	 * Retrieves the single instance of this class.
-	 */
-	public static Database getInstance() {
-		return singleton;
-	}
-	
-	/**
-	 * loades the courses from the file path specified 
-	 * into the Database, returns true if successful.
-	 */
-	boolean initialize(String coursesFilePath) {
-		// TODO: implement
-		return false;
-	}
+    /**
+     * Retrieves the single instance of this class.
+     */
+    public static Database getInstance() {
+        return singleton;
+    }
+
+    /**
+     * loades the courses from the file path specified
+     * into the Database, returns true if successful.
+     */
+    boolean initialize(String coursesFilePath) {
+        // TODO: implement
+        return false;
+    }
 
 
 }

@@ -1,4 +1,4 @@
-100|Logic|[]|5
+00|Logic|[]|5
 101|Computing|[]|5
 102|Algebra 1|[]|4
 103|Calculus 1|[]|4
