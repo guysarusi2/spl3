@@ -11,7 +11,7 @@ public class TPCMain {
 
         try {
             Database.getInstance().initialize("Courses.txt");
-            Server.reactor(3,7777,()->new BGRSMessagingProtocol(),()->new BGRSMessageEncoderDecoder<>()).serve();
+            Server.reactor(3,7777,()->new BGRSMessagingProtocol(),()->new BGRSMessageEncoderDecoder()).serve();
         }
 
         catch (IOException e) {}

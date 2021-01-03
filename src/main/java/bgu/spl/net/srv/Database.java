@@ -132,9 +132,9 @@ public class Database {
     }
 
     public String getPassword(String username) {
-        usersRWLock.writeLock().lock();
+        usersRWLock.readLock().lock();
         String output = allUsers.get(username).getPassword();
-        usersRWLock.writeLock().unlock();
+        usersRWLock.readLock().unlock();
 
         return output;
     }

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class BGRSMessagingProtocol implements MessagingProtocol<String> {
     private boolean shouldTerminate = false;
-    private static final HashMap<Short, BGRSCallback> CALLBACKS = new HashMap<>(); //todo init
+    private static final HashMap<Short, BGRSCallback> CALLBACKS = new HashMap<>();
     static{
         CALLBACKS.put((short) 1, new RegisterNewAdminFunction());
         CALLBACKS.put((short) 2, new RegisterNewStudentFunction());
@@ -29,7 +29,9 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
     @Override
     public String process(String msg){
         short msg_OPCODE= extractMsgOPCODE(msg);
+        System.out.println("OP"+msg_OPCODE);
         String response=CALLBACKS.get(msg_OPCODE).run(this,msg.substring(2).getBytes());
+        System.out.println(response);
         return ((response==null) ? error(msg_OPCODE) : acknowledge(msg_OPCODE,response));
         /*
         read first 2 bytes, then create message by this OPCOD
@@ -48,7 +50,9 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
     public void Terminate(){shouldTerminate=true;}
 
     private short extractMsgOPCODE(String msg){
-        return 0;       // TODO impl
+        byte[] b=msg.substring(0,2).getBytes(StandardCharsets.UTF_8); //todo removwe
+        //System.out.println(twoBytesArrToShort(b));
+        return twoBytesArrToShort(b);
     }
 
     private String error(short msg_OPCODE){
@@ -58,14 +62,17 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
         bytesArr[1] = (byte)(errorOPCODE & 0xFF);
         bytesArr[2] = (byte)((msg_OPCODE >> 8) & 0xFF);
         bytesArr[3] = (byte)(msg_OPCODE & 0xFF);
+        System.out.println("err" +(new String(bytesArr, StandardCharsets.UTF_8)));
         return new String(bytesArr, StandardCharsets.UTF_8);
     }
 
     private String acknowledge(short msg_OPCODE, String response){
        String msg_OPCODE_str = new String(shortToByteArray(msg_OPCODE),StandardCharsets.UTF_8);
        String acc_arr_str = new String(shortToByteArray((short) 12),StandardCharsets.UTF_8);
-
-       return msg_OPCODE_str + acc_arr_str+response;
+        System.out.println("ack" +acc_arr_str+msg_OPCODE_str +response);
+        if (response!="")
+            response+='\0';
+       return acc_arr_str+msg_OPCODE_str +response;
     }
 
 
