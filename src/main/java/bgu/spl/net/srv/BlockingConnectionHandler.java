@@ -2,6 +2,8 @@ package bgu.spl.net.srv;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.MessagingProtocol;
+import bgu.spl.net.srv.DatabaseObjects.User;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -52,4 +54,6 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
         connected = false;
         sock.close();
     }
+
+
 }

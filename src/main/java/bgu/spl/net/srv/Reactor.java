@@ -93,7 +93,8 @@ public class Reactor<T> implements Server<T> {
 
 
     private void handleAccept(ServerSocketChannel serverChan, Selector selector) throws IOException {
-        SocketChannel clientChan = serverChan.accept();
+        System.out.println("New client !!");        //todo remove
+        SocketChannel clientChan = serverChan.accept();//todo: check returned value
         clientChan.configureBlocking(false);
         final NonBlockingConnectionHandler<T> handler = new NonBlockingConnectionHandler<>(
                 readerFactory.get(),

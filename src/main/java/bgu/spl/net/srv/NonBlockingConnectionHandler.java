@@ -2,6 +2,7 @@ package bgu.spl.net.srv;
 
 import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.MessagingProtocol;
+import bgu.spl.net.srv.DatabaseObjects.User;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,6 +21,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     private final Queue<ByteBuffer> writeQueue = new ConcurrentLinkedQueue<>();
     private final SocketChannel chan;
     private final Reactor reactor;
+
 
     public NonBlockingConnectionHandler(
             MessageEncoderDecoder<T> reader,
@@ -102,6 +104,8 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
         }
     }
 
+
+
     private static ByteBuffer leaseBuffer() {
         ByteBuffer buff = BUFFER_POOL.poll();
         if (buff == null) {
@@ -115,5 +119,6 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     private static void releaseBuffer(ByteBuffer buff) {
         BUFFER_POOL.add(buff);
     }
+
 
 }

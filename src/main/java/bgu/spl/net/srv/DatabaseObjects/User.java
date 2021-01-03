@@ -1,15 +1,31 @@
 package bgu.spl.net.srv.DatabaseObjects;
 
-public abstract class User {
-    private String username;
-    private String password;
+public interface User {
 
-    public User(String username, String password){
-        username = username;
-        password = password;
+    public String getPassword();
+
+    public String getUsername();
+
+    default public boolean courseRegister(short courseNumber) {
+        return false;
     }
 
-    public String getPassword(){return password;}
-    public String getUsername(){return username;}
+    default public boolean courseUnregister(short courseNumber) {
+        return false;
+    }
 
+    default public String kdamCheck(short courseNumber) {
+        return null;
+    }
+
+    default public String isRegisteredTo(short courseNumber) {
+        return null;
+    }
+
+    default public String getCourseStatus(short courseNumber) {return null;}
+    default public String getStudentStatus(String username) {return null;}
+    default public String getCoursesString() {
+        return null;
+    }
+    default public String getStatus(){return null;}
 }
