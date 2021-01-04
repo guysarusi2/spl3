@@ -15,10 +15,11 @@ public class LoginFunction implements BGRSCallback {
         if(protocol.isUserConnected())
             return null;
         String username= message.substring(0,message.indexOf('\0'));
-        if(!Database.getInstance().isUserExist(username))
+        if(!Database.getInstance().isUserExist(username) || Database.getInstance().isAlreadyConnected(username))
             return null;
-        String password = message.substring(message.indexOf('\0')+1,message.length());
-        if(!(Database.getInstance().getPassword(username).equals( password)))
+        //String password = message.substring(message.indexOf('\0')+1,message.length()-1);      //todo remove
+        String password = message.substring(message.indexOf('\0')+1,message.length()-1);
+        if(!(Database.getInstance().verifyPassword(username,password)))
             return null;
 
         protocol.setUser(Database.getInstance().getUser(username));

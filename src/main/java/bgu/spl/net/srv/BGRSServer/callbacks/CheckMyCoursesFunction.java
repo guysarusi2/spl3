@@ -10,6 +10,7 @@ public class CheckMyCoursesFunction implements BGRSCallback{
         if(!protocol.isUserConnected())
             return null;
 
+        String str = protocol.getUser().getCoursesString();
         return protocol.getUser().getCoursesString();
     }
 

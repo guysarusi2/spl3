@@ -7,6 +7,7 @@ import bgu.spl.net.srv.DatabaseObjects.User;
 import java.io.*;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -23,6 +24,7 @@ public class Database {
 
     private final ConcurrentHashMap<Short, Course> allCourses;
     private final ConcurrentHashMap<String, User> allUsers;
+    private final ConcurrentSkipListSet<User> connectedUsers;
     private ReadWriteLock usersRWLock;
 
     //to prevent user from creating new Database
@@ -30,6 +32,7 @@ public class Database {
         allCourses = new ConcurrentHashMap<>();
         allUsers = new ConcurrentHashMap<>();
         usersRWLock = new ReentrantReadWriteLock();
+        connectedUsers = new ConcurrentSkipListSet<>();
     }
 
     private static class SingletonHolder {
@@ -62,6 +65,16 @@ public class Database {
         br = new BufferedReader(new FileReader(file));
         while ((line = br.readLine()) != null)
             updateCourse(line);
+    }
+
+    public void connectUser(String toConnect){
+        connectedUsers.add(getUser(toConnect));
+    }
+    public void disconnectUser(String toDisconnect){
+        connectedUsers.remove(getUser(toDisconnect));
+    }
+    public boolean isAlreadyConnected(String user){
+        return connectedUsers.contains(getUser(user));
     }
 
     private Course createCourse(String line) {
@@ -131,11 +144,12 @@ public class Database {
         return output;
     }
 
-    public String getPassword(String username) {
+    public boolean verifyPassword(String username, String password) {
         usersRWLock.readLock().lock();
-        String output = allUsers.get(username).getPassword();
+        String curr = allUsers.get(username).getPassword();
         usersRWLock.readLock().unlock();
 
+        boolean output = curr.equals(password);
         return output;
     }
 
@@ -200,11 +214,11 @@ public class Database {
 
     public boolean registerStudent(Student toAdd, short courseNumber) {
         Course course = allCourses.get(courseNumber);
-        if (course == null || course.isFullyBooked() || !course.verifyKdams(toAdd))
+        if (course == null || course.isFullyBooked() || !course.verifyKdams(toAdd)|| course.getStudentsList().contains(toAdd))
             return false;
 
-        course.registerStudent(toAdd);
-        return toAdd.getRegisteredCourses().add(course);
+
+        return course.registerStudent(toAdd) && toAdd.getRegisteredCourses().add(course);
     }
 
     public String kdamCheck(short courseNumber) {

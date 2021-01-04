@@ -55,7 +55,7 @@ public class Student implements User{
 
     @Override
     public String getStatus(){
-        return String.format("Student: %d + Courses: %s", username,getCoursesString()) ;
+        return String.format("Student: %s\nCourses: %s", username,getCoursesString()) ;
     }
 
     public String getPassword(){return password;}

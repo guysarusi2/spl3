@@ -5,6 +5,7 @@ import bgu.spl.net.srv.BGRSServer.callbacks.*;
 import bgu.spl.net.srv.DatabaseObjects.User;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class BGRSMessagingProtocol implements MessagingProtocol<String> {
@@ -30,11 +31,15 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
     public String process(String msg){
         short msg_OPCODE= extractMsgOPCODE(msg);
         System.out.println("OP"+msg_OPCODE);
-        String response=CALLBACKS.get(msg_OPCODE).run(this,msg.substring(2).getBytes());
+        if(!CALLBACKS.containsKey(msg_OPCODE))
+            return error(msg_OPCODE);
+
+
+        String response=CALLBACKS.get(msg_OPCODE).run(this,(msg.substring(2)).getBytes(StandardCharsets.UTF_8));
         System.out.println(response);
         return ((response==null) ? error(msg_OPCODE) : acknowledge(msg_OPCODE,response));
         /*
-        read first 2 bytes, then create message by this OPCOD
+        read first 2 bytes, then create message by this OPCODE
         case opcode is 4(LOGOUT):
             if
         * */
@@ -44,7 +49,8 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
     public boolean shouldTerminate(){ return shouldTerminate;}
 
     public boolean isUserConnected(){return currentUser!=null;}
-    public User getUser(){return currentUser;}
+    public User getUser(){
+        return currentUser;}
     public User setUser(User user){return currentUser=user;}
     public void removeUser(){currentUser=null;}
     public void Terminate(){shouldTerminate=true;}
