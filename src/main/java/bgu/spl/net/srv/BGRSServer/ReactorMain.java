@@ -9,12 +9,10 @@ import java.io.IOException;
 
 public class ReactorMain {
     public static void main(String[] args) {
-
-
         try {
             Database.getInstance().initialize("Courses.txt");
             Student s1 = new Student("a","1");
-            Student s2 = new Student("b","2");
+            Student s2 = new Student("b","2");          //todo remove all
             Student s3 = new Student("c","3");
             Student s4 = new Student("d","4");
 

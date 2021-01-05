@@ -20,7 +20,7 @@ public class RegisterNewStudentFunction implements BGRSCallback {
         String username= message.substring(0,message.indexOf('\0'));
         if(Database.getInstance().isUserExist(username))
             return null;
-        String password = message.substring(message.indexOf('\0')+1);
+        String password = message.substring(message.indexOf('\0')+1,message.length()-1);
         Database.getInstance().addUser(new Student(username,password));
 
         return "";

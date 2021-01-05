@@ -24,6 +24,9 @@ public class Course implements Comparable<Course>{
         KdamCoursesList = KdamCoursesList;
         numOfMaxStudents = numOfMaxStudents;
         serialNumber = serialNumber;
+        serialNumber = serialNumber;
+        serialNumber = serialNumber;
+        serialNumber = serialNumber;
     }*/                 //todo: NEED?
 
     public void update(Course[] KdamCoursesList, int numOfMaxStudents){
