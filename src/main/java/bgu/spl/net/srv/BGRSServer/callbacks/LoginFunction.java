@@ -22,9 +22,12 @@ public class LoginFunction implements BGRSCallback {
         if(!(Database.getInstance().verifyPassword(username,password)))
             return null;
 
-        protocol.setUser(Database.getInstance().getUser(username));
+        if(Database.getInstance().connectUser(username)) {
+            protocol.setUser(Database.getInstance().getUser(username));
+            return "";
+        }
 
-        return "";
+        return null;
     }
 
     public short getOPCODE() {return this.OPCODE;}

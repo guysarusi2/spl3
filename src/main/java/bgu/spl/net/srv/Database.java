@@ -26,6 +26,7 @@ public class Database {
     private final ConcurrentHashMap<String, User> allUsers;
     private final ConcurrentSkipListSet<User> connectedUsers;
     private ReadWriteLock usersRWLock;
+    private ReadWriteLock connectedUsersRWLock;
 
     //to prevent user from creating new Database
     private Database() {
@@ -33,6 +34,7 @@ public class Database {
         allUsers = new ConcurrentHashMap<>();
         usersRWLock = new ReentrantReadWriteLock();
         connectedUsers = new ConcurrentSkipListSet<>();
+        connectedUsersRWLock = new ReentrantReadWriteLock();
     }
 
     private static class SingletonHolder {
@@ -51,7 +53,7 @@ public class Database {
      * into the Database, returns true if successful.
      */
     public void initialize(String coursesFilePath) throws IOException {
-        // TODO try with resources (should close file)
+        // TODO try WITH resources (should close file)
         File file = new File(coursesFilePath);
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -67,14 +69,23 @@ public class Database {
             updateCourse(line);
     }
 
-    public void connectUser(String toConnect){
-        connectedUsers.add(getUser(toConnect));
+    public boolean connectUser(String toConnect){
+        connectedUsersRWLock.writeLock().lock();
+        boolean out = connectedUsers.add(getUser(toConnect));
+        connectedUsersRWLock.writeLock().unlock();
+        return out;
     }
-    public void disconnectUser(String toDisconnect){
-        connectedUsers.remove(getUser(toDisconnect));
+    public boolean disconnectUser(String toDisconnect){
+        connectedUsersRWLock.writeLock().lock();
+        boolean out = connectedUsers.remove(getUser(toDisconnect));
+        connectedUsersRWLock.writeLock().unlock();
+        return out;
     }
     public boolean isAlreadyConnected(String user){
-        return connectedUsers.contains(getUser(user));
+        connectedUsersRWLock.readLock().lock();
+        boolean output = connectedUsers.contains(getUser(user));
+        connectedUsersRWLock.readLock().unlock();
+        return output;
     }
 
     private Course createCourse(String line) {
@@ -135,7 +146,6 @@ public class Database {
         return counter;
     }
 
-
     public boolean isUserExist(String username) {
         usersRWLock.readLock().lock();
         boolean output = allUsers.containsKey(username);
@@ -149,8 +159,7 @@ public class Database {
         String curr = allUsers.get(username).getPassword();
         usersRWLock.readLock().unlock();
 
-        boolean output = curr.equals(password);
-        return output;
+        return curr.equals(password);
     }
 
     public User getUser(String username) {
@@ -167,33 +176,37 @@ public class Database {
             return null;
 
         // ************* VARIFYING MATCHES *********************  TODO REMOVE
-        boolean userWasRegisteredInStudent = toCheck.getRegisteredCourses().contains(course);
-        boolean userWasRegisteredInCourse = course.getStudentsList().contains(toCheck);
+        boolean userWasRegisteredInStudent = toCheck.isRegisteredTo(course.getCourseNumber())==null;
+        boolean userWasRegisteredInCourse = course.checkForStudent(toCheck);
+
+
         if (userWasRegisteredInStudent != userWasRegisteredInCourse)
-            throw new IllegalArgumentException("בעיה אחושרמוטה 2s");
+            throw new IllegalArgumentException("בעיה אחושרמוטה 2s");            //Todo remove
 
         return (userWasRegisteredInStudent) ? "REGISTERED" : "NOT REGISTERED";
 
     }
 
-    public User addUser(User toAdd) {            //todo user or void?
+    public boolean addUser(User toAdd) {//todo user or void?
         usersRWLock.writeLock().lock();
-        toAdd = allUsers.put(toAdd.getUsername(), toAdd);
+        boolean out = allUsers.containsKey(toAdd.getUsername());
+        if (!out)
+            allUsers.put(toAdd.getUsername(), toAdd);
         usersRWLock.writeLock().unlock();
 
-        return toAdd;
+        return out;
     }
 
     public String getCourseStatus(short courseNumber) {
         Course c = allCourses.get(courseNumber);
         if (c == null)
             return null;
-        String list = c.getStudentsListString();
+            String list = c.getStudentsListString();
 
-        return String.format("Course: (%d) %s\n"
-                        + "Seats Available: %d / %d\n"
-                        + "Students Registered: %s",
-                c.getCourseNumber(), c.getCourseName(), c.getAvailableSeats(), c.getNumOfMaxStudents(), list);
+            return String.format("Course: (%d) %s\n"
+                            + "Seats Available: %d/%d\n"            //todo should be  spaces? ie: %d / %d
+                            + "Students Registered: %s",
+                    c.getCourseNumber(), c.getCourseName(), c.getAvailableSeats(), c.getNumOfMaxStudents(), list);
     }
 
     public String getStudentStatus(String username) {
@@ -212,13 +225,22 @@ public class Database {
         return output;
     }
 
+    public Course getCourse(short courseNumber){
+        return allCourses.get(courseNumber);
+    }
+
     public boolean registerStudent(Student toAdd, short courseNumber) {
         Course course = allCourses.get(courseNumber);
-        if (course == null || course.isFullyBooked() || !course.verifyKdams(toAdd)|| course.getStudentsList().contains(toAdd))
+        if (course == null || course.isFullyBooked() || !course.verifyKdams(toAdd)|| course.checkForStudent(toAdd))
             return false;
 
+        boolean userWasRegisteredInStudent = toAdd.addCourse(course);            //////////////////////////// TODO *****************************
+        boolean userWasRegisteredInCourse = course.registerStudent(toAdd);
 
-        return course.registerStudent(toAdd) && toAdd.getRegisteredCourses().add(course);
+        if(userWasRegisteredInStudent != userWasRegisteredInCourse)
+            System.out.println("baaya ahusharmuta 4s");
+
+        return userWasRegisteredInStudent && userWasRegisteredInCourse;
     }
 
     public String kdamCheck(short courseNumber) {
@@ -232,12 +254,22 @@ public class Database {
 
     public boolean unregisterStudent(Student toRemove, short courseNumber) {
         Course course = allCourses.get(courseNumber);
-        if (course == null)
+        if (course == null || toRemove.isRegisteredTo(courseNumber)==null || !course.checkForStudent(toRemove))
             return false;
+        boolean userWasRegisteredInStudent = toRemove.removeCourse(course);            //////////////////////////// TODO *****************************
+        boolean userWasRegisteredInCourse = course.unregisterStudent(toRemove);
 
         // ************* VARIFYING MATCHES *********************  TODO REMOVE
-        boolean userWasRegisteredInStudent = toRemove.getRegisteredCourses().remove(course);
-        boolean userWasRegisteredInCourse = course.unregisterStudent(toRemove);
+//        boolean userWasRegisteredInStudent;
+//        boolean userWasRegisteredInCourse;
+//        synchronized (toRemove){
+//            synchronized (course){
+//                 userWasRegisteredInStudent = toRemove.removeCourse(course);            //////////////////////////// TODO *****************************
+//                 userWasRegisteredInCourse = course.unregisterStudent(toRemove);
+//                if (userWasRegisteredInStudent != userWasRegisteredInCourse)
+//                    throw new IllegalArgumentException("בעיה אחושרמוטה");
+//            }
+//        }
         if (userWasRegisteredInStudent != userWasRegisteredInCourse)
             throw new IllegalArgumentException("בעיה אחושרמוטה");
 

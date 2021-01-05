@@ -35,7 +35,8 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
             return error(msg_OPCODE);
 
 
-        String response=CALLBACKS.get(msg_OPCODE).run(this,(msg.substring(2)).getBytes(StandardCharsets.UTF_8));
+        byte[] arg = (msg.substring(2)).getBytes(StandardCharsets.UTF_8);       //combine
+        String response=CALLBACKS.get(msg_OPCODE).run(this,arg);
         //System.out.println(response);//todo delete
         return ((response==null) ? error(msg_OPCODE) : acknowledge(msg_OPCODE,response));
         /*

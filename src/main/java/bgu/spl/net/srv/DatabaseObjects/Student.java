@@ -4,22 +4,30 @@ import bgu.spl.net.srv.Database;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Student implements User{
     private String username;
     private String password;
 
     private LinkedList<Course> registeredCourses;
+    private ReadWriteLock registeredCoursesRWLock;
 
     public Student(String username, String password) {
         this.username = username;
         this.password = password;
         registeredCourses = new LinkedList<>();
+        registeredCoursesRWLock = new ReentrantReadWriteLock();
     }
 
     @Override
     public boolean courseRegister(short courseNumber){
-        return Database.getInstance().registerStudent(this, courseNumber);
+        registeredCoursesRWLock.writeLock().lock();
+        boolean out= Database.getInstance().registerStudent(this, courseNumber);
+        registeredCoursesRWLock.writeLock().unlock();
+        return out;
     }
 
     //public boolean isRegisteredTo(Course course){return registeredCourses.contains(course);}
@@ -29,29 +37,59 @@ public class Student implements User{
 
 
     public boolean courseUnregister(short courseNumber){
-        return Database.getInstance().unregisterStudent(this, courseNumber);
+        registeredCoursesRWLock.writeLock().lock();
+        boolean out = Database.getInstance().unregisterStudent(this, courseNumber);
+        registeredCoursesRWLock.writeLock().unlock();
+        return out;
     }
+
+    public boolean removeCourse(Course course){
+        registeredCoursesRWLock.writeLock().lock();       //todo??
+        boolean out = registeredCourses.remove(course);
+        registeredCoursesRWLock.writeLock().unlock();
+        return out;
+    }
+    public boolean addCourse(Course course){
+        registeredCoursesRWLock.writeLock().lock();        //todo??
+        boolean out = registeredCourses.add(course);
+        registeredCoursesRWLock.writeLock().unlock();
+        return out;
+    }
+
     @Override
     public String isRegisteredTo(short courseNumber){
-        return Database.getInstance().isStudentRegisteredTo(this,courseNumber);
+        Course course = Database.getInstance().getCourse(courseNumber);
+        registeredCoursesRWLock.readLock().lock();
+        String out= (registeredCourses.contains(course)) ? "REGISTERED" : "NOT REGISTERED";
+        registeredCoursesRWLock.readLock().unlock();
+        return out;
     }
 
     @Override
     public String getCoursesString(){
         String output = "[";
+        registeredCoursesRWLock.writeLock().lock();
         registeredCourses.sort((Course c1, Course c2)->{
             return c1.getSerialNumber()- c2.getSerialNumber(); });
+        registeredCoursesRWLock.writeLock().unlock();
 
+        registeredCoursesRWLock.readLock().lock();
         for (Course c:registeredCourses){
             output+=c.getCourseNumber();
             if(c!=registeredCourses.getLast())
                 output+=",";
         }
+        registeredCoursesRWLock.readLock().unlock();
 
         return output+"]";
     }
 
-    public List<Course> getRegisteredCourses(){return registeredCourses;}
+//    public List<Course> getRegisteredCourses(){
+//        registeredCoursesRWLock.readLock().lock();
+//        List<Course> cl = (List<Course>) registeredCourses.clone();
+//        registeredCoursesRWLock.readLock().unlock();
+//        return cl;
+//    }
 
     @Override
     public String getStatus(){
@@ -60,6 +98,5 @@ public class Student implements User{
 
     public String getPassword(){return password;}
     public String getUsername(){return username;}
-
 
 }

@@ -3,6 +3,8 @@ package bgu.spl.net.srv.BGRSServer.callbacks;
 import bgu.spl.net.srv.BGRSServer.BGRSMessagingProtocol;
 import bgu.spl.net.srv.DatabaseObjects.User;
 
+import java.nio.charset.StandardCharsets;
+
 public class CourseUnregisterFunction implements BGRSCallback{
     private final static short OPCODE = 10;
     @Override
@@ -10,7 +12,8 @@ public class CourseUnregisterFunction implements BGRSCallback{
         if(!protocol.isUserConnected())
             return null;
 
-        short courseNumber = BGRSMessagingProtocol.twoBytesArrToShort(msg);
+        short courseNumber = Short.parseShort(new String(msg, StandardCharsets.UTF_8));     //todo GOOD?
+       // short courseNumber = BGRSMessagingProtocol.twoBytesArrToShort(msg);
 
         User user = protocol.getUser();
         boolean success = user.courseUnregister(courseNumber);

@@ -4,6 +4,7 @@ import bgu.spl.net.srv.BGRSServer.BGRSMessagingProtocol;
 import bgu.spl.net.srv.Database;
 import bgu.spl.net.srv.DatabaseObjects.Admin;
 import bgu.spl.net.srv.DatabaseObjects.Student;
+import bgu.spl.net.srv.DatabaseObjects.User;
 
 import java.nio.charset.StandardCharsets;
 
@@ -22,10 +23,11 @@ public class RegisterNewAdminFunction<T> implements BGRSCallback {
         if(Database.getInstance().isUserExist(username))
             return null;
         String password = message.substring(message.indexOf('\0')+1,message.length()-1);
-        Database.getInstance().addUser(new Admin(username,password));
+        boolean out =Database.getInstance().addUser(new Admin(username,password));
+
         //Database.getInstance().addUser(protocol.setUser(new Admin(username,password)));
 
-        return "";
+        return  (!out)? "" : null;
     }
 
     public short getOPCODE() {return this.OPCODE;}

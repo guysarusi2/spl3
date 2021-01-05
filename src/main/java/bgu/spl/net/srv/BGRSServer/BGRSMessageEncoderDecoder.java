@@ -3,12 +3,12 @@ package bgu.spl.net.srv.BGRSServer;
 import bgu.spl.net.api.MessageEncoderDecoder;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class BGRSMessageEncoderDecoder  implements MessageEncoderDecoder<String> {
 
     private byte[] bytes = new byte[1<<10];
     private int len = 0;
-    private short OPCODE = -1;
     private short numberOfSegments = -1;
 
 
@@ -41,7 +41,11 @@ public class BGRSMessageEncoderDecoder  implements MessageEncoderDecoder<String>
     }
 
     private String popString(){
-        String str = new String(bytes, 0, len, StandardCharsets.UTF_8);
+        String str;
+        if(numberOfSegments==-2)
+            str = new String(bytes,0,2,StandardCharsets.UTF_8) + BGRSMessagingProtocol.twoBytesArrToShort(Arrays.copyOfRange(bytes,2,4));
+        else
+            str = new String(bytes, 0, len, StandardCharsets.UTF_8);
         len=0;
         numberOfSegments=-1;
         return str;

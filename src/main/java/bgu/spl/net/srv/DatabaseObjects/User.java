@@ -1,6 +1,6 @@
 package bgu.spl.net.srv.DatabaseObjects;
 
-public interface User {
+public interface User extends Comparable<User> {
 
     public String getPassword();
 
@@ -28,4 +28,5 @@ public interface User {
         return null;
     }
     default public String getStatus(){return null;}
+    default public int compareTo(User var1){return getUsername().compareTo(var1.getUsername());}
 }
