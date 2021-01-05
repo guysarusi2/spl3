@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class TPCMain {
     public static void main(String[] args){
-        int port = Integer.parseInt(args[0]);
+        //int port = Integer.parseInt(args[0]);
 
 /*            Database.getInstance().initialize("Courses.txt");
             Student s1 = new Student("a","1");
@@ -37,7 +37,7 @@ public class TPCMain {
             s2.courseRegister((short)100);
 
             s2.courseRegister((short)100);*/
-            Server.threadPerClient(port,()->new BGRSMessagingProtocol(),()->new BGRSMessageEncoderDecoder()).serve();
+            Server.threadPerClient(7777,()->new BGRSMessagingProtocol(),()->new BGRSMessageEncoderDecoder()).serve();
 
 
 
