@@ -30,13 +30,13 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
     @Override
     public String process(String msg){
         short msg_OPCODE= extractMsgOPCODE(msg);
-        System.out.println("OP"+msg_OPCODE);
+        //System.out.println("OP"+msg_OPCODE);//todo delete
         if(!CALLBACKS.containsKey(msg_OPCODE))
             return error(msg_OPCODE);
 
 
         String response=CALLBACKS.get(msg_OPCODE).run(this,(msg.substring(2)).getBytes(StandardCharsets.UTF_8));
-        System.out.println(response);
+        //System.out.println(response);//todo delete
         return ((response==null) ? error(msg_OPCODE) : acknowledge(msg_OPCODE,response));
         /*
         read first 2 bytes, then create message by this OPCODE
@@ -68,14 +68,14 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
         bytesArr[1] = (byte)(errorOPCODE & 0xFF);
         bytesArr[2] = (byte)((msg_OPCODE >> 8) & 0xFF);
         bytesArr[3] = (byte)(msg_OPCODE & 0xFF);
-        System.out.println("err" +(new String(bytesArr, StandardCharsets.UTF_8)));
+        //System.out.println("err" +(new String(bytesArr, StandardCharsets.UTF_8)));todo delete
         return new String(bytesArr, StandardCharsets.UTF_8);
     }
 
     private String acknowledge(short msg_OPCODE, String response){
        String msg_OPCODE_str = new String(shortToByteArray(msg_OPCODE),StandardCharsets.UTF_8);
        String acc_arr_str = new String(shortToByteArray((short) 12),StandardCharsets.UTF_8);
-        System.out.println("ack" +acc_arr_str+msg_OPCODE_str +response);
+        //System.out.println("ack" +acc_arr_str+msg_OPCODE_str +response);//todo delete
         if (response!="")
             response+='\0';
        return acc_arr_str+msg_OPCODE_str +response;

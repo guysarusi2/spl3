@@ -58,7 +58,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
 
                             T response = protocol.process(nextMessage);
                             if (response != null) {
-                                System.out.println("response "+response);//todo delete
+                                //System.out.println("response "+response);//todo delete
                                 writeQueue.add(ByteBuffer.wrap(encdec.encode(response)));
                                 reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
                             }

@@ -36,7 +36,7 @@ public class BGRSMessageEncoderDecoder  implements MessageEncoderDecoder<String>
 
     @Override
     public byte[] encode(String message){
-        System.out.println((message)); //todo remove
+        //System.out.println((message)); //todo remove
         return (message).getBytes(StandardCharsets.UTF_8);
     }
 
