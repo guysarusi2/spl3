@@ -23,7 +23,10 @@ public class Admin implements User {
 
     @Override
     public String getStudentStatus(String username) {
-        return Database.getInstance().getUser(username).getStatus();
+        User toGet = Database.getInstance().getUser(username);
+        if(toGet == null)
+            return null;
+        return toGet.getStatus();
     }
 
 }

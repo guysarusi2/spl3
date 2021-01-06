@@ -10,15 +10,12 @@ import java.io.IOException;
 public class ReactorMain {
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
-
         try {
             Database.getInstance().initialize("Courses.txt");
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-
         Server.reactor(3,port,()->new BGRSMessagingProtocol(),()->new BGRSMessageEncoderDecoder()).serve();
-
     }
 }

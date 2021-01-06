@@ -30,11 +30,8 @@ public class Student implements User{
         return out;
     }
 
-    //public boolean isRegisteredTo(Course course){return registeredCourses.contains(course);}
-
     @Override
     public String kdamCheck(short courseNumber){return Database.getInstance().kdamCheck(courseNumber);}
-
 
     public boolean courseUnregister(short courseNumber){
         registeredCoursesRWLock.writeLock().lock();
@@ -44,13 +41,13 @@ public class Student implements User{
     }
 
     public boolean removeCourse(Course course){
-        registeredCoursesRWLock.writeLock().lock();       //todo??
+        registeredCoursesRWLock.writeLock().lock();
         boolean out = registeredCourses.remove(course);
         registeredCoursesRWLock.writeLock().unlock();
         return out;
     }
     public boolean addCourse(Course course){
-        registeredCoursesRWLock.writeLock().lock();        //todo??
+        registeredCoursesRWLock.writeLock().lock();
         boolean out = registeredCourses.add(course);
         registeredCoursesRWLock.writeLock().unlock();
         return out;
@@ -59,6 +56,8 @@ public class Student implements User{
     @Override
     public String isRegisteredTo(short courseNumber){
         Course course = Database.getInstance().getCourse(courseNumber);
+        if(course==null)
+            return null;
         registeredCoursesRWLock.readLock().lock();
         String out= (registeredCourses.contains(course)) ? "REGISTERED" : "NOT REGISTERED";
         registeredCoursesRWLock.readLock().unlock();
@@ -84,18 +83,10 @@ public class Student implements User{
         return output+"]";
     }
 
-//    public List<Course> getRegisteredCourses(){
-//        registeredCoursesRWLock.readLock().lock();
-//        List<Course> cl = (List<Course>) registeredCourses.clone();
-//        registeredCoursesRWLock.readLock().unlock();
-//        return cl;
-//    }
-
     @Override
     public String getStatus(){
         return String.format("Student: %s\nCourses: %s", username,getCoursesString()) ;
     }
-
     public String getPassword(){return password;}
     public String getUsername(){return username;}
 

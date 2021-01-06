@@ -15,12 +15,10 @@ public class CourseRegisterFunction implements BGRSCallback{
         if(!protocol.isUserConnected())
             return null;
 
-        short courseNumber = Short.parseShort(new String(msg, StandardCharsets.UTF_8));     //todo GOOD?
-        //short courseNumber = BGRSMessagingProtocol.twoBytesArrToShort(msg);
+        short courseNumber = Short.parseShort(new String(msg, StandardCharsets.UTF_8));
 
         User user = protocol.getUser();
         boolean success = user.courseRegister(courseNumber);
-
         return (success) ? "" : null;
     }
 

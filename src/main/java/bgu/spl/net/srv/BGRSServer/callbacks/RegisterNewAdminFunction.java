@@ -12,9 +12,6 @@ public class RegisterNewAdminFunction<T> implements BGRSCallback {
     private final static short OPCODE = 1;
     @Override
     public String run(BGRSMessagingProtocol protocol, byte[] msg) {
-        // [username + \0 + password + \0]
-        ///return true iff added user equals user on connection handler
-
         String message = new String(msg, StandardCharsets.UTF_8);
 
         if(protocol.isUserConnected())
@@ -24,8 +21,6 @@ public class RegisterNewAdminFunction<T> implements BGRSCallback {
             return null;
         String password = message.substring(message.indexOf('\0')+1,message.length()-1);
         boolean out =Database.getInstance().addUser(new Admin(username,password));
-
-        //Database.getInstance().addUser(protocol.setUser(new Admin(username,password)));
 
         return  (!out)? "" : null;
     }

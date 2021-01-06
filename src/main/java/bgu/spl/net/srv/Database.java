@@ -28,7 +28,6 @@ public class Database {
     private ReadWriteLock usersRWLock;
     private ReadWriteLock connectedUsersRWLock;
 
-    //to prevent user from creating new Database
     private Database() {
         allCourses = new ConcurrentHashMap<>();
         allUsers = new ConcurrentHashMap<>();
@@ -53,20 +52,22 @@ public class Database {
      * into the Database, returns true if successful.
      */
     public void initialize(String coursesFilePath) throws IOException {
-        // TODO try WITH resources (should close file)
         File file = new File(coursesFilePath);
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        try(BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            for (int i = 1; (line = br.readLine()) != null; i++) {
+                Course temp = createCourse(line);
+                temp.setSerialNumber(i);
+                allCourses.put(temp.getCourseNumber(), temp);
+            }
 
-        String line;
-        for (int i = 1; (line = br.readLine()) != null; i++) {
-            Course temp = createCourse(line);
-            temp.setSerialNumber(i);
-            allCourses.put(temp.getCourseNumber(), temp);
+            try(BufferedReader br2 = new BufferedReader(new FileReader(file))) {
+                while ((line = br2.readLine()) != null)
+                    updateCourse(line);
+            }
+        }catch(FileNotFoundException e){
+            System.out.println("wasn't able to read "+coursesFilePath);
         }
-
-        br = new BufferedReader(new FileReader(file));
-        while ((line = br.readLine()) != null)
-            updateCourse(line);
     }
 
     public boolean connectUser(String toConnect){
@@ -139,7 +140,6 @@ public class Database {
             return 1;
 
         int counter = 1;
-
         for (int i = 0; i < kdamCourses.length(); i++)
             counter = (kdamCourses.charAt(i) == ',') ? counter + 1 : counter;
 
@@ -170,24 +170,7 @@ public class Database {
         return output;
     }
 
-    public String isStudentRegisteredTo(Student toCheck, short courseNumber) {
-        Course course = allCourses.get(courseNumber);
-        if (course == null)
-            return null;
-
-        // ************* VARIFYING MATCHES *********************  TODO REMOVE
-        boolean userWasRegisteredInStudent = toCheck.isRegisteredTo(course.getCourseNumber())==null;
-        boolean userWasRegisteredInCourse = course.checkForStudent(toCheck);
-
-
-        if (userWasRegisteredInStudent != userWasRegisteredInCourse)
-            throw new IllegalArgumentException("בעיה אחושרמוטה 2s");            //Todo remove
-
-        return (userWasRegisteredInStudent) ? "REGISTERED" : "NOT REGISTERED";
-
-    }
-
-    public boolean addUser(User toAdd) {//todo user or void?
+    public boolean addUser(User toAdd) {
         usersRWLock.writeLock().lock();
         boolean out = allUsers.containsKey(toAdd.getUsername());
         if (!out)
@@ -204,25 +187,9 @@ public class Database {
             String list = c.getStudentsListString();
 
             return String.format("Course: (%d) %s\n"
-                            + "Seats Available: %d/%d\n"            //todo should be  spaces? ie: %d / %d
+                            + "Seats Available: %d/%d\n"
                             + "Students Registered: %s",
                     c.getCourseNumber(), c.getCourseName(), c.getAvailableSeats(), c.getNumOfMaxStudents(), list);
-    }
-
-    public String getStudentStatus(String username) {
-        usersRWLock.readLock().lock();
-        User user = allUsers.get(username);
-        usersRWLock.readLock().unlock();
-
-        return user.getStatus();
-    }
-
-    public User removeUser(User toRemove) {
-        usersRWLock.writeLock().lock();
-        User output = allUsers.remove(toRemove);
-        usersRWLock.writeLock().unlock();
-
-        return output;
     }
 
     public Course getCourse(short courseNumber){
@@ -234,11 +201,8 @@ public class Database {
         if (course == null || course.isFullyBooked() || !course.verifyKdams(toAdd)|| course.checkForStudent(toAdd))
             return false;
 
-        boolean userWasRegisteredInStudent = toAdd.addCourse(course);            //////////////////////////// TODO *****************************
+        boolean userWasRegisteredInStudent = toAdd.addCourse(course);
         boolean userWasRegisteredInCourse = course.registerStudent(toAdd);
-
-        if(userWasRegisteredInStudent != userWasRegisteredInCourse)
-            System.out.println("baaya ahusharmuta 4s");
 
         return userWasRegisteredInStudent && userWasRegisteredInCourse;
     }
@@ -251,27 +215,12 @@ public class Database {
         return course.getKdamsString();
     }
 
-
     public boolean unregisterStudent(Student toRemove, short courseNumber) {
         Course course = allCourses.get(courseNumber);
         if (course == null || toRemove.isRegisteredTo(courseNumber)==null || !course.checkForStudent(toRemove))
             return false;
-        boolean userWasRegisteredInStudent = toRemove.removeCourse(course);            //////////////////////////// TODO *****************************
+        boolean userWasRegisteredInStudent = toRemove.removeCourse(course);
         boolean userWasRegisteredInCourse = course.unregisterStudent(toRemove);
-
-        // ************* VARIFYING MATCHES *********************  TODO REMOVE
-//        boolean userWasRegisteredInStudent;
-//        boolean userWasRegisteredInCourse;
-//        synchronized (toRemove){
-//            synchronized (course){
-//                 userWasRegisteredInStudent = toRemove.removeCourse(course);            //////////////////////////// TODO *****************************
-//                 userWasRegisteredInCourse = course.unregisterStudent(toRemove);
-//                if (userWasRegisteredInStudent != userWasRegisteredInCourse)
-//                    throw new IllegalArgumentException("בעיה אחושרמוטה");
-//            }
-//        }
-        if (userWasRegisteredInStudent != userWasRegisteredInCourse)
-            throw new IllegalArgumentException("בעיה אחושרמוטה");
 
         return userWasRegisteredInStudent || userWasRegisteredInCourse;
     }

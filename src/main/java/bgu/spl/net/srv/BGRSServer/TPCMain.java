@@ -9,16 +9,14 @@ import bgu.spl.net.srv.Server;
 import java.io.IOException;
 
 public class TPCMain {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
-
         try {
             Database.getInstance().initialize("Courses.txt");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Server.reactor(3,port,()->new BGRSMessagingProtocol(),()->new BGRSMessageEncoderDecoder()).serve();
+        Server.reactor(3, port, () -> new BGRSMessagingProtocol(), () -> new BGRSMessageEncoderDecoder()).serve();
     }
 }

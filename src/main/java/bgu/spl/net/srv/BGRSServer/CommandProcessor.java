@@ -23,7 +23,6 @@ public class CommandProcessor {
                     consoleProcess.getInputStream());
             new Thread(consoleReader).start();
             consoleWriter = new PrintWriter(consoleProcess.getOutputStream());
-
         } catch (Exception e) {
             e.printStackTrace();
         }

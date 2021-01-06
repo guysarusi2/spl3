@@ -12,8 +12,6 @@ public class StudentStatusFunction implements BGRSCallback{
             return null;
 
         String username = new String(msg,0,msg.length-1, StandardCharsets.UTF_8);
-
-        String str = protocol.getUser().getStudentStatus(username);     //todo remove
         return protocol.getUser().getStudentStatus(username);
     }
 

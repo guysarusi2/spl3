@@ -11,9 +11,6 @@ public class RegisterNewStudentFunction implements BGRSCallback {
     private final static short OPCODE = 2;
     @Override
     public String run(BGRSMessagingProtocol protocol, byte[] msg) {
-        // [username + \0 + password + \0]
-        ///return true iff added user equals user on connection handler
-
         String message = new String(msg, StandardCharsets.UTF_8);
 
         if(protocol.isUserConnected())

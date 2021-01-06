@@ -7,8 +7,6 @@ public class LogoutFunction<T> implements BGRSCallback {
     private final static short OPCODE = 4;
     @Override
     public String run(BGRSMessagingProtocol protocol, byte[] msg) {
-        // [username + \0 + password + \0]
-
         if(!protocol.isUserConnected())
             return null;
 

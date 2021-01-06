@@ -30,25 +30,15 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
     @Override
     public String process(String msg){
         short msg_OPCODE= extractMsgOPCODE(msg);
-        //System.out.println("OP"+msg_OPCODE);//todo delete
         if(!CALLBACKS.containsKey(msg_OPCODE))
             return error(msg_OPCODE);
 
-
-        byte[] arg = (msg.substring(2)).getBytes(StandardCharsets.UTF_8);       //combine
+        byte[] arg = (msg.substring(2)).getBytes(StandardCharsets.UTF_8);
         String response=CALLBACKS.get(msg_OPCODE).run(this,arg);
-        //System.out.println(response);//todo delete
         return ((response==null) ? error(msg_OPCODE) : acknowledge(msg_OPCODE,response));
-        /*
-        read first 2 bytes, then create message by this OPCODE
-        case opcode is 4(LOGOUT):
-            if
-        * */
     }
-
     @Override
     public boolean shouldTerminate(){ return shouldTerminate;}
-
     public boolean isUserConnected(){return currentUser!=null;}
     public User getUser(){
         return currentUser;}
@@ -57,8 +47,7 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
     public void Terminate(){shouldTerminate=true;}
 
     private short extractMsgOPCODE(String msg){
-        byte[] b=msg.substring(0,2).getBytes(StandardCharsets.UTF_8); //todo removwe
-        //System.out.println(twoBytesArrToShort(b));
+        byte[] b=msg.substring(0,2).getBytes(StandardCharsets.UTF_8);
         return twoBytesArrToShort(b);
     }
 
@@ -69,17 +58,15 @@ public class BGRSMessagingProtocol implements MessagingProtocol<String> {
         bytesArr[1] = (byte)(errorOPCODE & 0xFF);
         bytesArr[2] = (byte)((msg_OPCODE >> 8) & 0xFF);
         bytesArr[3] = (byte)(msg_OPCODE & 0xFF);
-        //System.out.println("err" +(new String(bytesArr, StandardCharsets.UTF_8)));todo delete
         return new String(bytesArr, StandardCharsets.UTF_8);
     }
 
     private String acknowledge(short msg_OPCODE, String response){
        String msg_OPCODE_str = new String(shortToByteArray(msg_OPCODE),StandardCharsets.UTF_8);
-       String acc_arr_str = new String(shortToByteArray((short) 12),StandardCharsets.UTF_8);
-        //System.out.println("ack" +acc_arr_str+msg_OPCODE_str +response);//todo delete
-        if (response!="")
+       String ack_arr_str = new String(shortToByteArray((short) 12),StandardCharsets.UTF_8);
+        if (!response.equals(""))
             response+='\0';
-       return acc_arr_str+msg_OPCODE_str +response;
+       return ack_arr_str+msg_OPCODE_str +response;
     }
 
 

@@ -9,15 +9,14 @@ public class LoginFunction implements BGRSCallback {
     private final static short OPCODE = 3;
     @Override
     public String run(BGRSMessagingProtocol protocol, byte[] msg) {
-        // [username + \0 + password + \0]
         String message = new String(msg, StandardCharsets.UTF_8);
-
         if(protocol.isUserConnected())
             return null;
+
         String username= message.substring(0,message.indexOf('\0'));
         if(!Database.getInstance().isUserExist(username) || Database.getInstance().isAlreadyConnected(username))
             return null;
-        //String password = message.substring(message.indexOf('\0')+1,message.length()-1);      //todo remove
+
         String password = message.substring(message.indexOf('\0')+1,message.length()-1);
         if(!(Database.getInstance().verifyPassword(username,password)))
             return null;

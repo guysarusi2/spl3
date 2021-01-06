@@ -331,7 +331,10 @@ public class Tests implements Runnable {
             int numTimeSucUnregister=0;
             int numTimesUnsuccessful=0;
 
+
+            ArrayList<String> coursesLines =new ArrayList<>();
             for (String s : outputs) {
+                coursesLines.add(s);
                 switch (s) {
                     case "ACK 3":
                     case "ACK 5":
@@ -353,6 +356,7 @@ public class Tests implements Runnable {
                         break;
                 }
             }
+            Files.write(Paths.get("./kdamTestOutput.txt"), coursesLines, Charset.defaultCharset());
             int numberOfExtraSpacesInKdam=Math.min(p.getKdamCourses().get(0).numOfMaxStudents-actualSpots,2);
             boolean b1 = numTimesSuccess != (int)(actualSpots*4+4+numberOfExtraSpacesInKdam);
             boolean b2 = numTimesRegistered != actualSpots;
@@ -623,10 +627,9 @@ public class Tests implements Runnable {
         try {
             ArrayList<Course> nonShuffledCourseList;
 
-            final int numCoursesToGenerate = 7;
+            final int numCoursesToGenerate =10;
             for (int i = 0; i < numCoursesToGenerate; i++) {
                 int generatedCourseNum = ((int) (Math.random() * 2000) + 1337);
-                // int generatedCourseNum = ((int) (Math.random() * 100) + 25);
 
                 String courseName = UUID.randomUUID().toString().substring(0, 8);
                 int numOfMaxStudents = ((int) (Math.random() * (8) + 5));
@@ -671,16 +674,16 @@ public class Tests implements Runnable {
 
             ArrayList<String> testAnswers = new ArrayList<>();
             testAnswers.add(testRegistrationSameUser());
-//            testAnswers.add(testLoginMultipleSameUser());
-//            testAnswers.add(testRegisLoginLogoutMultipleDifferentUser());
-//            testAnswers.add(tryBulkStudentLogicalTests());
-//            testAnswers.add(tryBulkAdminLogicalTests());
-//            testAnswers.add(testRegisterCourseWithoutAnyKdam());
-//            testAnswers.add(testRegisterCourseWithKdam());
-//            testAnswers.add(testKdamCheck());
-//            testAnswers.add(testMyCourses());
-//            testAnswers.add(testStudentStat());
-            //testAnswers.add(testCourseStat());//todo
+            testAnswers.add(testLoginMultipleSameUser());
+            testAnswers.add(testRegisLoginLogoutMultipleDifferentUser());
+            testAnswers.add(tryBulkStudentLogicalTests());
+            testAnswers.add(tryBulkAdminLogicalTests());
+            testAnswers.add(testRegisterCourseWithoutAnyKdam());
+            testAnswers.add(testRegisterCourseWithKdam());
+            testAnswers.add(testKdamCheck());
+            testAnswers.add(testMyCourses());
+            testAnswers.add(testStudentStat());
+            testAnswers.add(testCourseStat());
 
             System.out.println("\r\n\r\n----------------------------------");
             for (String testAnswer : testAnswers) System.out.println(testAnswer);

@@ -6,7 +6,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Course implements Comparable<Course>{
-
     private int serialNumber;
     private short courseNumber;
     private String courseName;
@@ -22,17 +21,6 @@ public class Course implements Comparable<Course>{
         studentsListRWLock= new ReentrantReadWriteLock();
     }
 
-/*    public Course(int courseNum, String courseName,Course[] KdamCoursesList, int numOfMaxStudents, int serialNumber){
-        courseNum = courseNum;
-        courseName = courseName;
-        KdamCoursesList = KdamCoursesList;
-        numOfMaxStudents = numOfMaxStudents;
-        serialNumber = serialNumber;
-        serialNumber = serialNumber;
-        serialNumber = serialNumber;
-        serialNumber = serialNumber;
-    }*/                 //todo: NEED?
-
     public void update(Course[] KdamCoursesList, int numOfMaxStudents){
         this.kdamCoursesList = KdamCoursesList;
         this.numOfMaxStudents = numOfMaxStudents;
@@ -47,10 +35,6 @@ public class Course implements Comparable<Course>{
         int out = studentsList.size();
         studentsListRWLock.readLock().unlock();
         return out;
-    }
-    public String setCourseName(){return this.courseName;}
-    public Course[] getKdamCoursesList() {
-        return kdamCoursesList;
     }
 
     public boolean registerStudent(Student toAdd){
@@ -112,14 +96,6 @@ public class Course implements Comparable<Course>{
 
         return output+"]";
     }
-
-//    public List<Student> getStudentsList(){
-//        studentsListRWLock.readLock().lock();
-//        List<Student> cl =(List<Student>) this.studentsList.clone();
-//        studentsListRWLock.readLock().unlock();
-//        return cl;
-//    }
-
 
     public boolean isFullyBooked(){return this.numOfMaxStudents==this.getNumberOfRegisteredStudents();}
 

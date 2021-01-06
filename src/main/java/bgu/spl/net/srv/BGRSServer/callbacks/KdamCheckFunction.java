@@ -12,9 +12,7 @@ public class KdamCheckFunction implements BGRSCallback{
         if(!protocol.isUserConnected())
             return null;
 
-        short courseNumber = Short.parseShort(new String(msg, StandardCharsets.UTF_8));     //todo GOOD?
-        //short courseNumber = BGRSMessagingProtocol.twoBytesArrToShort(msg);
-
+        short courseNumber = Short.parseShort(new String(msg, StandardCharsets.UTF_8));
         User user = protocol.getUser();
         return user.kdamCheck(courseNumber);
     }
