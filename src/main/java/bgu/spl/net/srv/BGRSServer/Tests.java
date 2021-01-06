@@ -625,8 +625,8 @@ public class Tests implements Runnable {
 
             final int numCoursesToGenerate = 7;
             for (int i = 0; i < numCoursesToGenerate; i++) {
-               // int generatedCourseNum = ((int) (Math.random() * 2000) + 1337);
-                 int generatedCourseNum = ((int) (Math.random() * 100) + 25);
+                int generatedCourseNum = ((int) (Math.random() * 2000) + 1337);
+                // int generatedCourseNum = ((int) (Math.random() * 100) + 25);
 
                 String courseName = UUID.randomUUID().toString().substring(0, 8);
                 int numOfMaxStudents = ((int) (Math.random() * (8) + 5));
@@ -671,15 +671,15 @@ public class Tests implements Runnable {
 
             ArrayList<String> testAnswers = new ArrayList<>();
             testAnswers.add(testRegistrationSameUser());
-            testAnswers.add(testLoginMultipleSameUser());
-            testAnswers.add(testRegisLoginLogoutMultipleDifferentUser());
-            testAnswers.add(tryBulkStudentLogicalTests());
-            testAnswers.add(tryBulkAdminLogicalTests());
-            testAnswers.add(testRegisterCourseWithoutAnyKdam());
-            testAnswers.add(testRegisterCourseWithKdam());
-            testAnswers.add(testKdamCheck());
-            testAnswers.add(testMyCourses());
-            testAnswers.add(testStudentStat());
+//            testAnswers.add(testLoginMultipleSameUser());
+//            testAnswers.add(testRegisLoginLogoutMultipleDifferentUser());
+//            testAnswers.add(tryBulkStudentLogicalTests());
+//            testAnswers.add(tryBulkAdminLogicalTests());
+//            testAnswers.add(testRegisterCourseWithoutAnyKdam());
+//            testAnswers.add(testRegisterCourseWithKdam());
+//            testAnswers.add(testKdamCheck());
+//            testAnswers.add(testMyCourses());
+//            testAnswers.add(testStudentStat());
             //testAnswers.add(testCourseStat());//todo
 
             System.out.println("\r\n\r\n----------------------------------");
